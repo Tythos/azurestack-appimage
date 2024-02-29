@@ -1,0 +1,26 @@
+stages:
+- build
+- image
+- push
+
+build_job:
+  stage: build
+  image: node
+  script:
+  - cd static
+  - yarn install
+  - yarn run build
+
+image_job:
+  stage: image
+  image: docker
+  script:
+  - docker build -t azurestack_appimage:latest .
+
+push_job:
+  stage: push
+  image: docker
+  script:
+  - docker login ${REGISTRY_URL} -u ${REGISTRY_USER} -p ${REGISTRY_TOKEN}
+  - docker tag azurestack_appimage:latest ${REGISTRY_URL}/azurestack_appimage:latest
+  - docker push
